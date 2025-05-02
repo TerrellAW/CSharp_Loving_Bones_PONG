@@ -138,6 +138,12 @@ namespace PONG
             // Get Keyboard state
             var kstate = Keyboard.GetState();
 
+            // Toggle fullscreen with F11
+            if (kstate.IsKeyDown(Keys.F11))
+            {
+                ToggleFullscreen();
+            }
+
             // Game state
             if (gamestate == GameState.Start)
             {
@@ -153,16 +159,16 @@ namespace PONG
                 // Start game loop
                 GameStateManager.WeGaming(
                     ref gamestate,
-                    gameTime, 
-                    kstate, 
-                    ref _boneSpeed1, 
-                    ref _bonePosition1, 
-                    _graphics, 
-                    _boneTexture, 
-                    ref _boneSpeed2, 
-                    ref _bonePosition2, 
-                    ref _skullSpeed, 
-                    ref _skullPosition, 
+                    gameTime,
+                    kstate,
+                    ref _boneSpeed1,
+                    ref _bonePosition1,
+                    _graphics,
+                    _boneTexture,
+                    ref _boneSpeed2,
+                    ref _bonePosition2,
+                    ref _skullSpeed,
+                    ref _skullPosition,
                     _skullTexture,
                     ref _randomIntX,
                     ref _randomIntY,
@@ -326,6 +332,26 @@ namespace PONG
             }
 
             base.Draw(gameTime);
+        }
+
+        private void ToggleFullscreen()
+        {
+            _graphics.IsFullScreen = !_graphics.IsFullScreen;
+
+            if (_graphics.IsFullScreen)
+            {
+                // When fullscreen, use desktop resolution
+                _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+                _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            }
+            else
+            {
+                // Return to window size
+                _graphics.PreferredBackBufferWidth = 800; // Set your desired width
+                _graphics.PreferredBackBufferHeight = 600; // Set your desired height
+            }
+
+            _graphics.ApplyChanges();
         }
     }
 }
