@@ -66,6 +66,10 @@ namespace PONG
         // Game state
         GameState gamestate = GameState.Start;
 
+        // Virtual Resolution fields
+        private RenderTarget2D _renderTarget;
+        private Rectangle _destinationRectangle;
+
         // Player
         private string player = "";
 
@@ -80,18 +84,18 @@ namespace PONG
         {
             // Initialize entity positions
             _skullPosition = new Vector2(
-                _graphics.PreferredBackBufferWidth / 2,
-                _graphics.PreferredBackBufferHeight / 2
+                GameConstants.VirtualWidth / 2,
+                GameConstants.VirtualHeight / 2
             );
 
             _bonePosition1 = new Vector2(
                 10,
-                _graphics.PreferredBackBufferHeight / 2
+                GameConstants.VirtualHeight / 2
             );
 
             _bonePosition2 = new Vector2(
-                _graphics.PreferredBackBufferWidth - 10,
-                _graphics.PreferredBackBufferHeight / 2
+                GameConstants.VirtualWidth - 10,
+                GameConstants.VirtualHeight / 2
             );
 
             _skullSpeed = 100f;
@@ -108,6 +112,16 @@ namespace PONG
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            // Set up virtual resolution
+            _renderTarget = new RenderTarget2D(
+                GraphicsDevice,
+                GameConstants.VirtualWidth,
+                GameConstants.VirtualHeight
+            );
+
+            // Calculate destination rectangle for scaling
+            CalculateScalingRectangle();
 
             // Load game assets
             _skullTexture = Content.Load<Texture2D>("skull");
@@ -196,7 +210,7 @@ namespace PONG
             _spriteBatch.DrawString(
                 _font,
                 "PONG",
-                new Vector2((_graphics.PreferredBackBufferWidth / 2) - 65, _graphics.PreferredBackBufferHeight / 2 - 100),
+                new Vector2((GameConstants.VirtualWidth / 2) - 65, GameConstants.VirtualHeight / 2 - 100),
                 Color.White
             );
             _spriteBatch.End();
@@ -206,7 +220,7 @@ namespace PONG
             _spriteBatch.DrawString(
                 _font2,
                 "By CSharp Loving Bones",
-                new Vector2((_graphics.PreferredBackBufferWidth / 2) - 150, _graphics.PreferredBackBufferHeight / 2),
+                new Vector2((GameConstants.VirtualWidth / 2) - 150, GameConstants.VirtualHeight / 2),
                 Color.White
             );
             _spriteBatch.End();
@@ -216,7 +230,7 @@ namespace PONG
             _spriteBatch.DrawString(
                 _font2,
                 "Press Enter to Start",
-                new Vector2((_graphics.PreferredBackBufferWidth / 2) - 150, _graphics.PreferredBackBufferHeight / 2 + 100),
+                new Vector2((GameConstants.VirtualWidth / 2) - 150, GameConstants.VirtualHeight / 2 + 100),
                 Color.White
             );
             _spriteBatch.End();
@@ -274,7 +288,7 @@ namespace PONG
             _spriteBatch.DrawString(
                 _font,
                 _p1_points_string,
-                new Vector2((_graphics.PreferredBackBufferWidth / 2) - 200, 10),
+                new Vector2((GameConstants.VirtualWidth / 2) - 200, 10),
                 Color.White * 0.8f
             );
             _spriteBatch.End();
@@ -284,7 +298,7 @@ namespace PONG
             _spriteBatch.DrawString(
                 _font,
                 _p2_points_string,
-                new Vector2((_graphics.PreferredBackBufferWidth / 2) + 200, 10),
+                new Vector2((GameConstants.VirtualWidth / 2) + 200, 10),
                 Color.White * 0.8f
             );
             _spriteBatch.End();
@@ -297,7 +311,7 @@ namespace PONG
             _spriteBatch.DrawString(
                 _font,
                 "GAME OVER",
-                new Vector2((_graphics.PreferredBackBufferWidth / 2) - 180, _graphics.PreferredBackBufferHeight / 2 - 100),
+                new Vector2((GameConstants.VirtualWidth / 2) - 180, GameConstants.VirtualHeight / 2 - 100),
                 Color.White
             );
             _spriteBatch.End();
@@ -307,7 +321,7 @@ namespace PONG
             _spriteBatch.DrawString(
                 _font2,
                 player + " Wins!",
-                new Vector2((_graphics.PreferredBackBufferWidth / 2) - 100, _graphics.PreferredBackBufferHeight / 2),
+                new Vector2((GameConstants.VirtualWidth / 2) - 100, GameConstants.VirtualHeight / 2),
                 Color.White
             );
             _spriteBatch.End();
@@ -315,6 +329,9 @@ namespace PONG
 
         protected override void Draw(GameTime gameTime)
         {
+            // Set the render target to the virtual resolution
+            GraphicsDevice.SetRenderTarget(_renderTarget);
+
             // Background colour
             GraphicsDevice.Clear(Color.Black);
 
@@ -330,6 +347,15 @@ namespace PONG
             {
                 EndScreenDraw();
             }
+
+            // Reset render target to the back buffer
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(Color.Black);
+
+            // Draw scaled render target to the screen
+            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            _spriteBatch.Draw(_renderTarget, _destinationRectangle, Color.White);
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }
@@ -347,11 +373,30 @@ namespace PONG
             else
             {
                 // Return to window size
-                _graphics.PreferredBackBufferWidth = 800; // Set your desired width
-                _graphics.PreferredBackBufferHeight = 600; // Set your desired height
+                _graphics.PreferredBackBufferWidth = GameConstants.VirtualWidth;
+                _graphics.PreferredBackBufferHeight = GameConstants.VirtualHeight;
             }
 
             _graphics.ApplyChanges();
+
+            // Recalculate the scaling rectangle after changing resolution
+            CalculateScalingRectangle();
+        }
+
+        private void CalculateScalingRectangle()
+        {
+            // Scale that maintains aspect ratio
+            float scaleX = (float)GraphicsDevice.Viewport.Width / GameConstants.VirtualWidth;
+            float scaleY = (float)GraphicsDevice.Viewport.Height / GameConstants.VirtualHeight;
+            float scale = Math.Min(scaleX, scaleY);
+
+            // Calculate the destination rectangle for scaling
+            int width = (int)(GameConstants.VirtualWidth * scale);
+            int height = (int)(GameConstants.VirtualHeight * scale);
+            int x = (GraphicsDevice.Viewport.Width - width) / 2;
+            int y = (GraphicsDevice.Viewport.Height - height) / 2;
+
+            _destinationRectangle = new Rectangle(x, y, width, height);
         }
     }
 }

@@ -1,11 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace PONG
@@ -57,16 +52,16 @@ namespace PONG
         // Function for game loop
         internal static void WeGaming(
             ref GameState gamestate,
-            GameTime gameTime, 
-            KeyboardState kstate, 
-            ref float _boneSpeed1, 
-            ref Vector2 _bonePosition1, 
-            GraphicsDeviceManager _graphics, 
-            Texture2D _boneTexture, 
-            ref float _boneSpeed2, 
-            ref Vector2 _bonePosition2, 
-            ref float _skullSpeed, 
-            ref Vector2 _skullPosition, 
+            GameTime gameTime,
+            KeyboardState kstate,
+            ref float _boneSpeed1,
+            ref Vector2 _bonePosition1,
+            GraphicsDeviceManager _graphics,
+            Texture2D _boneTexture,
+            ref float _boneSpeed2,
+            ref Vector2 _bonePosition2,
+            ref float _skullSpeed,
+            ref Vector2 _skullPosition,
             Texture2D _skullTexture,
             ref int _randomIntX,
             ref int _randomIntY,
@@ -95,9 +90,9 @@ namespace PONG
             }
 
             // Bone 1 Edge Collision
-            if (_bonePosition1.Y > _graphics.PreferredBackBufferHeight - _boneTexture.Height / 2)
+            if (_bonePosition1.Y > GameConstants.VirtualHeight - _boneTexture.Height / 2)
             {
-                _bonePosition1.Y = _graphics.PreferredBackBufferHeight - _boneTexture.Height / 2;
+                _bonePosition1.Y = GameConstants.VirtualHeight - _boneTexture.Height / 2;
             }
             else if (_bonePosition1.Y < _boneTexture.Height / 2)
             {
@@ -122,9 +117,9 @@ namespace PONG
             }
 
             // Bone 2 Edge Collision
-            if (_bonePosition2.Y > _graphics.PreferredBackBufferHeight - _boneTexture.Height / 2)
+            if (_bonePosition2.Y > GameConstants.VirtualHeight - _boneTexture.Height / 2)
             {
-                _bonePosition2.Y = _graphics.PreferredBackBufferHeight - _boneTexture.Height / 2;
+                _bonePosition2.Y = GameConstants.VirtualHeight - _boneTexture.Height / 2;
             }
             else if (_bonePosition2.Y < _boneTexture.Height / 2)
             {
@@ -157,7 +152,7 @@ namespace PONG
             }
 
             // Skull Edge Bounce
-            if (_skullPosition.Y > _graphics.PreferredBackBufferHeight - _skullTexture.Height / 2)
+            if (_skullPosition.Y > GameConstants.VirtualHeight - _skullTexture.Height / 2)
             {
                 _randomIntY = _randomIntY == 0 ? 1 : 0;
             }
@@ -193,8 +188,8 @@ namespace PONG
                 {
                     // Skull reset, launch to P1
                     _skullPosition = new Vector2(
-                        _graphics.PreferredBackBufferWidth / 2,
-                        _graphics.PreferredBackBufferHeight / 2
+                        GameConstants.VirtualWidth / 2,
+                        GameConstants.VirtualHeight / 2
                     );
 
                     _skullSpeed = 150f;
@@ -246,8 +241,8 @@ namespace PONG
                 {
                     // Skull reset, launch to P2
                     _skullPosition = new Vector2(
-                        _graphics.PreferredBackBufferWidth / 2,
-                        _graphics.PreferredBackBufferHeight / 2
+                        GameConstants.VirtualWidth / 2,
+                        GameConstants.VirtualHeight / 2
                     );
 
                     _skullSpeed = 150f;
