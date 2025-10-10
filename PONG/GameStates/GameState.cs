@@ -300,7 +300,7 @@ namespace PONG
         }
 
         // Function for end screen
-        internal static void EndScreen(int _p1_points, string player)
+        internal static string EndScreen(int _p1_points, string player)
         {
             if (_p1_points == 11)
             {
@@ -312,6 +312,8 @@ namespace PONG
                 // P2 wins
                 player = "Player II";
             }
+
+            return player;
         }
     }
 }

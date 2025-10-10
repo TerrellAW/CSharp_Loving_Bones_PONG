@@ -196,7 +196,7 @@ namespace PONG
             else
             {
                 // End screen
-                GameStateManager.EndScreen(_p1_points, player);
+                player = GameStateManager.EndScreen(_p1_points, player);
             }
 
             base.Update(gameTime);
